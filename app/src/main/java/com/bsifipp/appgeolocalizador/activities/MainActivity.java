@@ -2,6 +2,8 @@ package com.bsifipp.appgeolocalizador.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,18 +22,21 @@ import com.bsifipp.appgeolocalizador.models.Cidade;
 import com.bsifipp.appgeolocalizador.models.GoogleApiModel;
 import com.bsifipp.appgeolocalizador.models.UF;
 import com.bsifipp.appgeolocalizador.models.ViaCep;
+import com.bsifipp.appgeolocalizador.services.PermissionsService;
+import com.bsifipp.appgeolocalizador.utils.Permissions;
 import com.bsifipp.appgeolocalizador.utils.RetrofitConfig;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.zip.Inflater;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
-
+    PermissionsService permissionsService = new PermissionsService(this);
     private Spinner spEstado;
     private Spinner spCidade;
     private EditText etComplemento;
@@ -43,16 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private ViaCep viaCep;
     private GoogleApiModel googleApiModel;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        spEstado = findViewById(R.id.spEstado);
-        spCidade = findViewById(R.id.spCidade);
-        etComplemento = findViewById(R.id.etComplemento);
-        botaoPesquisar = findViewById(R.id.btnPesquisar);
-        lvListagem = findViewById(R.id.lvEnderecos);
-        this.CarregarEstados(spEstado);
+
+    private void setOnItemClickListenerEstado()
+    {
         spEstado.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -77,6 +75,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void setOnItemClickListenerCidade()
+    {
         spCidade.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -88,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void setOnClickListenerBotaoPesquisar()
+    {
         botaoPesquisar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,6 +127,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        permissionsService.CheckPermissionGranted();
+        spEstado = findViewById(R.id.spEstado);
+        spCidade = findViewById(R.id.spCidade);
+        etComplemento = findViewById(R.id.etComplemento);
+        botaoPesquisar = findViewById(R.id.btnPesquisar);
+        lvListagem = findViewById(R.id.lvEnderecos);
+        this.CarregarEstados(spEstado);
+        this.setOnItemClickListenerEstado();
+        this.setOnItemClickListenerCidade();
+        this.setOnClickListenerBotaoPesquisar();
+    }
+
 
     private void obterLongitudeLatitude(ViaCep viaCep)
     {
@@ -129,6 +151,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<GoogleApiModel> call, Response<GoogleApiModel> response) {
                 googleApiModel = (GoogleApiModel) response.body();
+                if(googleApiModel.status.equals("OK") && googleApiModel.results.size() > 0)
+                {
+                    Intent intent = new Intent(MainActivity.this,ActivityMaps.class);
+                    intent.putExtra("lng",googleApiModel.results.get(0).geometry.location.lng);
+                    intent.putExtra("lat",googleApiModel.results.get(0).geometry.location.lat);
+                    startActivity(intent);
+                }
+
             }
 
             @Override

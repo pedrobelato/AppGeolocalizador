@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.bsifipp.appgeolocalizador.R;
 import com.bsifipp.appgeolocalizador.services.PermissionsService;
@@ -29,15 +30,33 @@ public class ActivityMaps extends AppCompatActivity implements OnMapReadyCallbac
     private double lng;
     private double lat;
 
+    private TextView tvSiglaEstado;
+    private TextView tvCidade;
+    private TextView tvBairro;
+    private TextView tvRua;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        tvSiglaEstado = findViewById(R.id.tvSiglaEstado);
+        tvRua = findViewById(R.id.tvRua);
+        tvBairro = findViewById(R.id.tvBairro);
+        tvCidade = findViewById(R.id.tvCidade);
+
         Intent i = getIntent();
         lat = i.getDoubleExtra("lat",0);
         lng = i.getDoubleExtra("lng",0);
+        tvSiglaEstado.setText(i.getStringExtra("siglaEstado"));
+        tvBairro.setText("Bairro: " + i.getStringExtra("bairro"));
+        tvCidade.setText("Cidade: " + i.getStringExtra("cidade"));
+        tvRua.setText("Rua: " + i.getStringExtra("rua"));
+
         mapview = findViewById(R.id.mapView);
+
         fab=findViewById(R.id.floatingActionButton);
+
         mapview.setClickable(true);
 
         Bundle mapViewBundle = null;
@@ -51,8 +70,6 @@ public class ActivityMaps extends AppCompatActivity implements OnMapReadyCallbac
             gmap.moveCamera
                     (CameraUpdateFactory.newLatLng(new LatLng(lat, lng)));
         });
-
-
     }
 
     @Override
@@ -114,6 +131,4 @@ public class ActivityMaps extends AppCompatActivity implements OnMapReadyCallbac
         super.onLowMemory();
         mapview.onLowMemory();
     }
-
-
 }

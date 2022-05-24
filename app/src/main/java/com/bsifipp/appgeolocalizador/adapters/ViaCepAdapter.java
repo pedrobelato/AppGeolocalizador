@@ -35,7 +35,7 @@ public class ViaCepAdapter extends ArrayAdapter<ViaCep> {
 
         ViaCep vc = this.getItem(position);
 
-        tvLogradouro.setText(vc.logradouro);
+        tvLogradouro.setText(vc.logradouro + " - " + vc.complemento + " - " + vc.bairro);
 
         return convertView;
     }

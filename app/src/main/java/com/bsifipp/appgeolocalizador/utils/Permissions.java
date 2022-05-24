@@ -29,5 +29,4 @@ public class Permissions {
     public  void  requestPermissions( String[] PERMISSIONS,int PERMISSION_ALL) {
         ActivityCompat.requestPermissions((Activity) mContext, PERMISSIONS, PERMISSION_ALL);
     }
-
 }

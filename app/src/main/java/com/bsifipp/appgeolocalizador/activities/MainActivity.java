@@ -1,11 +1,14 @@
 package com.bsifipp.appgeolocalizador.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -156,9 +159,14 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this,ActivityMaps.class);
                     intent.putExtra("lng",googleApiModel.results.get(0).geometry.location.lng);
                     intent.putExtra("lat",googleApiModel.results.get(0).geometry.location.lat);
+
+                    intent.putExtra("bairro", viaCep.bairro);
+                    intent.putExtra("rua", viaCep.logradouro);
+                    intent.putExtra("cidade", viaCep.localidade);
+                    intent.putExtra("siglaEstado", viaCep.uf);
+
                     startActivity(intent);
                 }
-
             }
 
             @Override
@@ -213,5 +221,22 @@ public class MainActivity extends AppCompatActivity {
         {
             Log.i("ERRO" , e.getMessage());
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId())
+        {
+            case R.id.itFechar:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
